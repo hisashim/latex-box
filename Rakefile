@@ -24,3 +24,27 @@ desc "Create and package a new box using base box (#{BASE})"
 file NEW_BOX => [:vagrant_up] do |t|
   sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
 end
+
+desc "Destroy running VM and remove base box"
+task :clean do |t|
+  sh "BASE=#{BASE} vagrant destroy --force; true"
+  sh "BASE=#{BASE} vagrant box remove #{BASE}; true"
+end
+
+desc "Delete all downloaded/produced box files, in addition to clean"
+task :clobber => [:clean] do |t|
+  rm "*.box"
+end
+
+desc "Display help messages"
+task :help do |t|
+  puts <<-EOS.gsub(/^  /m,'')
+  LaTeX Box Builder: Build LaTeX-ready Vagrant box
+
+  Usage: rake package [VAR=VALUE]
+
+  Examples:
+    rake package #=> #{NEW_BOX}
+    rake package BASE=opscode-debian-x.x.x NEW=latex-box-x.x.x
+  EOS
+end
