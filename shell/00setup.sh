@@ -9,3 +9,8 @@ sed -i 's/mirrors.kernel.org/cdn.debian.net/g' $SOURCES_LIST
 sed -i 's/wheezy main$/wheezy main contrib non-free/g' $SOURCES_LIST
 # avoid interruption
 export DEBIAN_FRONTEND=noninteractive
+
+## chef
+
+apt-get -qq update
+apt-get --no-install-recommends -qq -y install chef
