@@ -1,8 +1,14 @@
 URL_BASE = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/"
+BOXES = {
+  "opscode-debian-7.2.0" =>
+  "opscode_debian-7.2.0_chef-provisionerless.box",
+  "opscode-debian-7.4.0" =>
+  "opscode_debian-7.4_chef-provisionerless.box",
+}
 BASE = ENV['BASE'] || "opscode-debian-7.4.0"
 NEW  = ENV['NEW']  || "latex-box-7.4.0"
 
-BASE_BOX = "opscode_debian-7.2.0_chef-provisionerless.box"
+BASE_BOX = BOXES[BASE]
 BASE_OVF = File.expand_path("~/.vagrant.d/boxes/#{BASE}/virtualbox/box.ovf")
 NEW_BOX = "#{NEW}.box"
 
