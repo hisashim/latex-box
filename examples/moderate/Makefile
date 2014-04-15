@@ -3,6 +3,7 @@ LATEX=latex
 BIBTEX=bibtex
 MAKEINDEX=makeindex
 DVIPDFMX=dvipdfmx
+LACHECK=lacheck
 VAGRANT=vagrant
 
 SOURCE_DIR=./
@@ -32,6 +33,9 @@ $(BUILD_DIR)%.dvi: $(SOURCE_DIR)%.tex
 
 build: $(OBJECTS)
 
+check: $(SOURCES)
+	$(LACHECK) $^ > $(BUILD_DIR)lacheck.log
+
 mostlyclean:
 	-rm -f $(addprefix $(BUILD_DIR),\
 	*.dvi *.aux *.out *.brf *.log \
@@ -47,6 +51,7 @@ vbuild: $(SOURCES) $(SCRIPTS)
 	$(VAGRANT) up
 	$(VAGRANT) ssh -c "cd /vagrant; cp -a --parents $(SOURCES) $(SCRIPTS) ~/"
 	$(VAGRANT) ssh -c "mkdir -p $(BUILD_DIR)"
+	$(VAGRANT) ssh -c "$(MAKE) check"
 	$(VAGRANT) ssh -c "$(MAKE) build"
 	$(VAGRANT) ssh -c "cp -a --parents $(ARTIFACTS) /vagrant; true"
 
@@ -64,6 +69,6 @@ help:
 	@echo "  make build  # build normally"
 	@echo "  make vbuild # build in virtual environment"
 
-.PHONY: all build clean help vbuild vclean vdestroy
+.PHONY: all build check clean help vbuild vclean vdestroy
 
 .PRECIOUS: $(ARTIFACTS)
