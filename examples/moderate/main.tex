@@ -1,0 +1,52 @@
+\documentclass[dvipdfmx]{book}
+
+\title{Lipsum}
+
+\usepackage{amsmath}
+\usepackage{makeidx}
+\makeindex
+\usepackage{hyperref}
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Preface}
+Lorem ipsum dolor sit amet.
+
+\mainmatter
+
+\chapter{Lorem}
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+\section{Ipsum}
+
+Lorem ipsum dolor sit amet\index{lorem}, consectetur adipisicing
+elit\cite{Lamport94}, sed do eiusmod tempor incididunt ut labore et
+dolore magna aliqua \ref{eqn:q}.
+
+\begin{equation}\label{eqn:q}
+y = ax^2 + b
+\end{equation}
+
+\appendix
+
+\chapter{Ut}
+
+Ut enim ad minim veniam\index{ut}, quis nostrud exercitation ullamco
+laboris nisi ut aliquip ex ea commodo consequat.
+
+\backmatter
+
+\bibliographystyle{plain}
+\bibliography{main}
+
+\printindex
+
+\end{document}
