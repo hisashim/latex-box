@@ -3,11 +3,15 @@ LATEX=latex
 BIBTEX=bibtex
 MAKEINDEX=makeindex
 DVIPDFMX=dvipdfmx
+VAGRANT=vagrant
 
 SOURCE_DIR=./
 BUILD_DIR=_build/
 SOURCES=$(addprefix $(SOURCE_DIR),main.tex main.bib)
+SCRIPTS=$(addprefix $(SOURCE_DIR),Makefile)
 OBJECTS=$(addprefix $(BUILD_DIR),main.pdf)
+LOGS=$(addprefix $(BUILD_DIR),*.log *.blg *.ilg)
+ARTIFACTS=$(OBJECTS) $(LOGS)
 
 all: build
 
@@ -39,8 +43,27 @@ clean: mostlyclean
 	-rm -f $(addprefix $(BUILD_DIR),*.pdf)
 	-rm -fr $(BUILD_DIR)
 
+vbuild: $(SOURCES) $(SCRIPTS)
+	$(VAGRANT) up
+	$(VAGRANT) ssh -c "cd /vagrant; cp -a --parents $(SOURCES) $(SCRIPTS) ~/"
+	$(VAGRANT) ssh -c "mkdir -p $(BUILD_DIR)"
+	$(VAGRANT) ssh -c "$(MAKE) build"
+	$(VAGRANT) ssh -c "cp -a --parents $(ARTIFACTS) /vagrant; true"
+
+vclean:
+	$(VAGRANT) up
+	$(VAGRANT) ssh -c "$(MAKE) clean"
+
+vdestroy:
+	$(VAGRANT) destroy
+	-rm -fr .vagrant
+
 help:
 	@echo "Usage:"
-	@echo "  make"
+	@echo "  vagrant box add latex-box latex-box-x.y.z.box"
+	@echo "  make build  # build normally"
+	@echo "  make vbuild # build in virtual environment"
 
-.PHONY: all build clean help
+.PHONY: all build clean help vbuild vclean vdestroy
+
+.PRECIOUS: $(ARTIFACTS)
