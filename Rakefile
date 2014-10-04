@@ -47,10 +47,10 @@ task :help do |t|
   puts <<-EOS.gsub(/^  /m,'')
   LaTeX Box Builder: Build LaTeX-ready Vagrant box
 
-  Usage: rake package [VAR=VALUE]
+  Usage: rake [VAR=VALUE]
 
   Examples:
-    rake package #=> #{NEW_BOX}
-    rake package BASE=opscode-debian-x.x.x NEW=latex-box-x.x.x
+    rake #=> #{NEW_BOX}
+    rake BASE=opscode-debian-x.x.x NEW=latex-box-x.x.x
   EOS
 end
