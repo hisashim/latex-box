@@ -4,9 +4,11 @@ BOXES = {
   "opscode_debian-7.2.0_chef-provisionerless.box",
   "opscode-debian-7.4.0" =>
   "opscode_debian-7.4_chef-provisionerless.box",
+  "opscode-debian-7.6.0" =>
+  "opscode_debian-7.6_chef-provisionerless.box",
 }
-BASE = ENV['BASE'] || "opscode-debian-7.4.0"
-NEW  = ENV['NEW']  || "latex-box-7.4.0"
+BASE = ENV['BASE'] || "opscode-debian-7.6.0"
+NEW  = ENV['NEW']  || "latex-box-7.6.0"
 
 BASE_BOX = BOXES[BASE]
 BASE_OVF = File.expand_path("~/.vagrant.d/boxes/#{BASE}/virtualbox/box.ovf")
