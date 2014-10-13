@@ -1,5 +1,5 @@
 URL_BASE = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/"
-BOXES = {
+BASE_BOXES = {
   "opscode-debian-7.2.0" =>
   "opscode_debian-7.2.0_chef-provisionerless.box",
   "opscode-debian-7.4.0" =>
@@ -8,13 +8,13 @@ BOXES = {
   "opscode_debian-7.6_chef-provisionerless.box",
 }
 BASE = ENV['BASE'] || "opscode-debian-7.6.0"
-NEW  = ENV['NEW']  || "latex-box-7.6.0"
+RELEASE = ENV['RELEASE'] || "latex-box-7.6.0"
 
-BASE_BOX = BOXES[BASE]
+BASE_BOX = BASE_BOXES[BASE]
 BASE_OVF = File.expand_path("~/.vagrant.d/boxes/#{BASE}/virtualbox/box.ovf")
-NEW_BOX = "#{NEW}.box"
+RELEASE_BOX = "#{RELEASE}.box"
 
-task :default => [NEW_BOX]
+task :default => [RELEASE_BOX]
 
 file BASE_BOX do |t|
   sh "curl -O #{URL_BASE + t.name}"
@@ -29,7 +29,7 @@ task :vagrant_up => [BASE_OVF] do |t|
 end
 
 desc "Create and package a new box using base box (#{BASE})"
-file NEW_BOX => [:vagrant_up] do |t|
+file RELEASE_BOX => [:vagrant_up] do |t|
   sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
 end
 
@@ -52,7 +52,7 @@ task :help do |t|
   Usage: rake [VAR=VALUE]
 
   Examples:
-    rake #=> #{NEW_BOX}
-    rake BASE=opscode-debian-x.x.x NEW=latex-box-x.x.x
+    rake #=> #{RELEASE_BOX}
+    rake BASE=opscode-debian-x.x.x RELEASE=latex-box-x.x.x
   EOS
 end
