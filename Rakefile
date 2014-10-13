@@ -17,39 +17,39 @@ BASE_OVF = File.expand_path("~/.vagrant.d/boxes/#{BASE}/virtualbox/box.ovf")
 RELEASE_BOX = "#{RELEASE}.box"
 SNAPSHOT_BOX = "#{SNAPSHOT}.box"
 
-task :default => [RELEASE_BOX]
-
-file BASE_BOX do |t|
+rule /#{BASE_BOXES.values.map{|b| Regexp.escape(b)}.join('|')}/ do |t|
   sh "curl -O #{URL_BASE + t.name}"
 end
 
-file BASE_OVF => [BASE_BOX] do |t|
+rule /#{[RELEASE_BOX, SNAPSHOT_BOX].map{|b| Regexp.escape(b)}.join('|')}/ =>
+  BASE_OVF do |t|
+  sh "BASE=#{BASE} vagrant up; true"
+  sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
+end
+
+file BASE_OVF => BASE_BOX do |t|
   sh "vagrant box add #{BASE} #{t.prerequisites.first}"
 end
 
-task :vagrant_up => [BASE_OVF] do |t|
-  sh "BASE=#{BASE} vagrant up; true"
-end
+desc "#{:release} (default)"
+task :default => :release
 
 desc "Package a new box (#{RELEASE}) using base box (#{BASE})"
-file RELEASE_BOX => [:vagrant_up] do |t|
-  sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
-end
+task :release => RELEASE_BOX
 
 desc "Package a new box (#{SNAPSHOT}) using base box (#{BASE})"
-file SNAPSHOT_BOX => [:vagrant_up] do |t|
-  sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
-end
+task :snapshot => SNAPSHOT_BOX
 
-desc "Destroy running VM and remove base box"
+desc "Destroy running VM, unregister base box, and delete generated box file"
 task :clean do |t|
   sh "BASE=#{BASE} vagrant destroy --force; true"
   sh "BASE=#{BASE} vagrant box remove #{BASE}; true"
+  rm_f [RELEASE_BOX, "#{RELEASE}*.box"]
 end
 
-desc "Delete all downloaded/produced box files, in addition to clean"
-task :clobber => [:clean] do |t|
-  rm "*.box"
+desc "Delete all downloaded box files, in addition to clean"
+task :clobber => :clean do |t|
+  rm_f BASE_BOXES.values
 end
 
 desc "Display help messages"
