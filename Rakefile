@@ -11,6 +11,8 @@ BASE = ENV['BASE'] || "opscode-debian-7.6.0"
 RELEASE = ENV['RELEASE'] || "latex-box-7.6.0"
 DATETIME ||= `date -u '+%Y%m%dT%H%M'`.chomp
 SNAPSHOT = ENV['SNAPSHOT']  || [RELEASE, DATETIME].join('-')
+PUBLISH_URL = ENV['PUBLISH_URL'] || 'publish_url'
+PUBLISH_SCRIPT = ENV['PUBLISH_SCRIPT']
 
 BASE_BOX = BASE_BOXES[BASE]
 BASE_OVF = File.expand_path("~/.vagrant.d/boxes/#{BASE}/virtualbox/box.ovf")
@@ -39,6 +41,20 @@ task :release => RELEASE_BOX
 
 desc "Package a new box (#{SNAPSHOT}) using base box (#{BASE})"
 task :snapshot => SNAPSHOT_BOX
+
+desc "Publish boxes to sites (URLs in #{PUBLISH_URL})"
+task :publish => PUBLISH_URL do |t|
+  urlfile = t.prerequisites.first
+  artifacts = FileList["*.box"] - BASE_BOXES.values
+  unless artifacts.empty?
+    if PUBLISH_SCRIPT
+      sh PUBLISH_SCRIPT, urlfile, artifacts.join(' ')
+    else
+      sh "cat #{urlfile} | xargs -n 1 -I{}" +
+        " curl #{artifacts.map{|a| '--upload ' + a}.join(' ')} {}"
+    end
+  end
+end
 
 desc "Destroy running VM, unregister base box, and delete generated box file"
 task :clean do |t|
