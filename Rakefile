@@ -9,10 +9,13 @@ BASE_BOXES = {
 }
 BASE = ENV['BASE'] || "opscode-debian-7.6.0"
 RELEASE = ENV['RELEASE'] || "latex-box-7.6.0"
+DATETIME ||= `date -u '+%Y%m%dT%H%M'`.chomp
+SNAPSHOT = ENV['SNAPSHOT']  || [RELEASE, DATETIME].join('-')
 
 BASE_BOX = BASE_BOXES[BASE]
 BASE_OVF = File.expand_path("~/.vagrant.d/boxes/#{BASE}/virtualbox/box.ovf")
 RELEASE_BOX = "#{RELEASE}.box"
+SNAPSHOT_BOX = "#{SNAPSHOT}.box"
 
 task :default => [RELEASE_BOX]
 
@@ -28,8 +31,13 @@ task :vagrant_up => [BASE_OVF] do |t|
   sh "BASE=#{BASE} vagrant up; true"
 end
 
-desc "Create and package a new box using base box (#{BASE})"
+desc "Package a new box (#{RELEASE}) using base box (#{BASE})"
 file RELEASE_BOX => [:vagrant_up] do |t|
+  sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
+end
+
+desc "Package a new box (#{SNAPSHOT}) using base box (#{BASE})"
+file SNAPSHOT_BOX => [:vagrant_up] do |t|
   sh "BASE=#{BASE} vagrant package --output #{t.name}; true"
 end
 
